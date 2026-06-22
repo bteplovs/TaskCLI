@@ -5,10 +5,10 @@ namespace app.Services
 {
     public interface ITaskService
     {
-        IEnumerable<TaskItem> GetAllTasks();
-        TaskItem GetTaskById(int id);
+        IEnumerable<TaskItem>? GetAllTasks();
+        TaskItem? GetTaskById(int id);
         void AddTask(TaskItem task);
-        void UpdateTask(TaskItem task);
+        void UpdateTask(int id, TaskItemStatus status);
         void DeleteTask(int id);
     }
 }
