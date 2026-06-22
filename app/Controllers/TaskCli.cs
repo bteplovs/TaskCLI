@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using app.Models;
 using app.Services;
 using Microsoft.VisualBasic;
 
@@ -10,9 +13,7 @@ namespace app.Controllers
 {
     public class TaskCli
     {
-
         private ITaskService _taskService;
-
         public TaskCli(ITaskService taskService)
         {
             _taskService = taskService;
@@ -30,15 +31,182 @@ namespace app.Controllers
                 switch (choice)
                 {
                     case "1":
-                        # method
+                        ListAllTasks();
                         break;
                     case "2":
-
+                        ListAllTasksByStatus(TaskItemStatus.Done);
+                        break;
+                    case "3":
+                        ListAllTasksByStatus(TaskItemStatus.Todo);
+                        break;
+                    case "4":
+                        ListAllTasksByStatus(TaskItemStatus.InProgress);
+                        break;
+                    case "5":
+                        UpdateTaskStatus();
+                        break;
+                    case "6":
+                        AddTask();
+                        break;
+                    case "7":
+                        DeleteTask();
+                        break;
+                    default:
+                        Console.WriteLine("Unkown option. Try again");
+                        break;
                 }
             }
-            
+        }
+
+        private void PrintMenu()
+        {
+            Console.WriteLine("== What would you like to do? ==");
+            Console.WriteLine( "1) List all tasks");
+            Console.WriteLine( "2) All tasks done");
+            Console.WriteLine( "3) All tasks todo");
+            Console.WriteLine( "4) All tasks in progress");
+            Console.WriteLine( "5) Update task status");
+            Console.WriteLine( "6) Add task");
+            Console.WriteLine( "7) Delete task");
+            Console.Write("> ");
+        }
+
+        private void ListAllTasks()
+        {
+            Console.WriteLine("== All Tasks ==");
+            var tasks = _taskService.GetAllTasks();
+            if (tasks.Count == 0)
+            {
+                Console.WriteLine("No tasks");
+            }
+
+            foreach (TaskItem taskItem in tasks)
+            {
+                taskItem.ToString();
+            }
 
         }
 
+        private void ListAllTasksByStatus(TaskItemStatus status)
+        {
+            Console.WriteLine($"== All {status} Tasks");
+            var tasks = _taskService.GetAllTasksByStatus(status);
+            if (tasks.Count == 0)
+            {
+                Console.WriteLine($"No tasks with status: {status}");
+            }
+
+            foreach (TaskItem taskItem in tasks)
+            {
+                taskItem.ToString();
+            }
+        }
+
+        private TaskItem? UpdateTaskStatus()
+        {
+            Console.WriteLine($"== Select a task to change status ==");
+            var tasks = _taskService.GetAllTasks();
+            if (tasks.Count == 0)
+            {
+                Console.WriteLine("No tasks");
+            }
+
+            foreach (TaskItem taskItem in tasks)
+            {
+                taskItem.ToString();
+            }
+
+            Console.Write("Change the task status (Todo, InProgress, Done) by: <taskId> <new status>. Or leave blank to cancel");
+            
+            while (true)
+            {
+                var input = Console.ReadLine()?.Trim();
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Console.WriteLine("Cancelled.");
+                    return null;
+                }
+
+                var inputAsList = input.Split();
+
+                if (int.TryParse(inputAsList[0], out int id))
+                {
+                    if (Enum.TryParse(inputAsList[0], out TaskItemStatus status))
+                    {
+                        _taskService.UpdateTask(id, status);
+                        return null; 
+                    }
+                    Console.WriteLine($"Invalid status '{status}'. Try again or leave blank to cancel.");
+                    Console.Write("> ");
+                } 
+                else
+                {
+                    Console.WriteLine($"No Task found with id '{id}'. Try again or leave blank to cancel.");
+                    Console.Write("> ");
+                }
+            }
+        }
+
+        private TaskItem? DeleteTask()
+        {
+            Console.WriteLine($"== Select a task to delete ==");
+            var tasks = _taskService.GetAllTasks();
+            if (tasks.Count == 0)
+            {
+                Console.WriteLine("No tasks");
+            }
+
+            foreach (TaskItem taskItem in tasks)
+            {
+                taskItem.ToString();
+            }
+
+            Console.Write("Delete the task by: <taskId>. Or leave blank to cancel");
+            
+            while (true)
+            {
+                var input = Console.ReadLine()?.Trim();
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Console.WriteLine("Cancelled.");
+                    return null;
+                }
+
+                if (int.TryParse(input, out int id))
+                {
+                    _taskService.DeleteTask(id);
+                    return null;
+                }
+
+                Console.WriteLine($"No Task found with id '{id}'. Try again or leave blank to cancel.");
+                Console.Write("> "); 
+            }
+        }
+
+        private TaskItem? AddTask()
+        {
+            while (true)
+            {
+                Console.Write("Name your task or leave blank to cancel: ");
+                var name = Console.ReadLine()?.Trim();
+
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    Console.WriteLine("Cancelled.");
+                    return null;
+                }
+
+                var newTask = new TaskItem
+                {
+                    Name = name,
+                    Status = TaskItemStatus.Todo,
+                    Created = DateTime.Now.ToString("yyyy-MM-dd")
+                };
+
+                _taskService.AddTask(newTask);
+                return null;
+
+            }
+        }
     }
 }

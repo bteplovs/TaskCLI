@@ -22,7 +22,7 @@ namespace app.Services
             this.InitializeDatabase();
         }
 
-        IEnumerable<TaskItem>? ITaskService.GetAllTasks()
+        public List<TaskItem> GetAllTasks()
         {
 
             var taskItems = new List<TaskItem>();
@@ -72,7 +72,7 @@ namespace app.Services
 
         }
 
-        IEnumerable<TaskItem>? ITaskService.GetAllTasksByStatus(TaskItemStatus status)
+        public List<TaskItem> GetAllTasksByStatus(TaskItemStatus status)
         {
 
             var taskItems = new List<TaskItem>();
@@ -123,7 +123,7 @@ namespace app.Services
 
         }
 
-        TaskItem? ITaskService.GetTaskById(int id)
+        public TaskItem? GetTaskById(int id)
         {
 
             TaskItem? taskItemToReturn = null;
@@ -172,7 +172,7 @@ namespace app.Services
             return taskItemToReturn;
         }
 
-        void ITaskService.AddTask(TaskItem task)
+        public void AddTask(TaskItem task)
         {
             try
             {
@@ -199,7 +199,7 @@ namespace app.Services
             }
         }
 
-        void ITaskService.UpdateTask(int id, TaskItemStatus status)
+        public void UpdateTask(int id, TaskItemStatus status)
         {
             try
             {
@@ -261,7 +261,6 @@ namespace app.Services
                     CREATE TABLE IF NOT EXISTS TaskItem (
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         Name TEXT NOT NULL,
-                        Description TEXT NOT NULL,
                         Status TEXT NOT NULL,
                         Created TEXT DEFAULT CURRENT_TIMESTAMP
                     );
