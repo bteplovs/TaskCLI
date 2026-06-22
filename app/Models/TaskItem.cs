@@ -14,5 +14,12 @@ namespace app.Models
         public string Name { get; set; }
         public TaskItemStatus Status { get; set; } = TaskItemStatus.Todo;
         public string Created { get; set; }
+
+        public override string ToString()
+        {
+            return $"\n Id: {Id}\n Name: {Name}\n Status: {Status}\n";
+
+        }
+
     }
 }

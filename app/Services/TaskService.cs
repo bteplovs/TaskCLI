@@ -53,10 +53,7 @@ namespace app.Services
                         };
                         taskItems.Add(taskItem);
                     }
-                }
-                else
-                {
-                    Console.WriteLine("No Tasks");
+                    return taskItems;
                 }
             }
             catch (Exception ex)
@@ -67,9 +64,7 @@ namespace app.Services
             {
                 _connection.Close();
             }
-
             return taskItems;
-
         }
 
         public List<TaskItem> GetAllTasksByStatus(TaskItemStatus status)
@@ -84,7 +79,7 @@ namespace app.Services
                 var sql = "SELECT * FROM TaskItem WHERE Status = @status";
 
                 using var command = new SqliteCommand(sql, _connection);
-                command.Parameters.AddWithValue("@status", status);
+                command.Parameters.AddWithValue("@status", status.ToString());
 
                 using var reader = command.ExecuteReader();
                 if (reader.HasRows)
@@ -104,10 +99,6 @@ namespace app.Services
                         };
                         taskItems.Add(taskItem);
                     }
-                }
-                else
-                {
-                    Console.WriteLine("No Tasks");
                 }
             }
             catch (Exception ex)
@@ -178,7 +169,7 @@ namespace app.Services
             {
                 _connection.Open();
 
-                var sql = "INSERT INTO TaskItems (Name, Status, Created)" + 
+                var sql = "INSERT INTO TaskItem (Name, Status, Created)" + 
                             "VALUES (@Name, @Status, @Created)";
                 
                 using var command = new SqliteCommand(sql, _connection);
@@ -205,7 +196,7 @@ namespace app.Services
             {
                 _connection.Open();
 
-                var sql = "UPDATE TaskItems SET Status = @status WHERE id = @id";
+                var sql = "UPDATE TaskItem SET Status = @status WHERE id = @id";
 
                 using var command = new SqliteCommand(sql, _connection);
 
@@ -275,9 +266,7 @@ namespace app.Services
             finally
             {
                 _connection.Close();
-                Console.WriteLine("Connection to SQLite database closed.");
             }
-            
         }
     }
 }

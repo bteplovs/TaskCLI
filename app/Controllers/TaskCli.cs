@@ -51,8 +51,11 @@ namespace app.Controllers
                     case "7":
                         DeleteTask();
                         break;
+                    case "0":
+                        Console.WriteLine("Goodbye!");
+                        return;
                     default:
-                        Console.WriteLine("Unkown option. Try again");
+                        Console.WriteLine("Unknown option. Try again");
                         break;
                 }
             }
@@ -68,6 +71,7 @@ namespace app.Controllers
             Console.WriteLine( "5) Update task status");
             Console.WriteLine( "6) Add task");
             Console.WriteLine( "7) Delete task");
+            Console.WriteLine( "0) Quit");
             Console.Write("> ");
         }
 
@@ -82,7 +86,7 @@ namespace app.Controllers
 
             foreach (TaskItem taskItem in tasks)
             {
-                taskItem.ToString();
+                Console.WriteLine(taskItem);
             }
 
         }
@@ -98,7 +102,7 @@ namespace app.Controllers
 
             foreach (TaskItem taskItem in tasks)
             {
-                taskItem.ToString();
+                Console.WriteLine(taskItem);
             }
         }
 
@@ -113,10 +117,10 @@ namespace app.Controllers
 
             foreach (TaskItem taskItem in tasks)
             {
-                taskItem.ToString();
+                Console.WriteLine(taskItem);
             }
 
-            Console.Write("Change the task status (Todo, InProgress, Done) by: <taskId> <new status>. Or leave blank to cancel");
+            Console.Write("Change the task status (Todo, InProgress, Done) using <taskId> <new status>. Or leave blank to cancel: ");
             
             while (true)
             {
@@ -127,21 +131,27 @@ namespace app.Controllers
                     return null;
                 }
 
-                var inputAsList = input.Split();
+                var inputAsList = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                if (inputAsList.Length != 2)
+                {
+                    Console.WriteLine("Please enter: <taskId> <Todo|InProgress|Done>");
+                    continue;
+                }
 
                 if (int.TryParse(inputAsList[0], out int id))
                 {
-                    if (Enum.TryParse(inputAsList[0], out TaskItemStatus status))
+                    if (Enum.TryParse(inputAsList[1], true, out TaskItemStatus status))
                     {
                         _taskService.UpdateTask(id, status);
                         return null; 
                     }
-                    Console.WriteLine($"Invalid status '{status}'. Try again or leave blank to cancel.");
+                    Console.WriteLine($"Invalid status '{inputAsList[1]}'. Try again or leave blank to cancel: ");
                     Console.Write("> ");
                 } 
                 else
                 {
-                    Console.WriteLine($"No Task found with id '{id}'. Try again or leave blank to cancel.");
+                    Console.WriteLine($"No Task found with id '{id}'. Try again or leave blank to cancel: ");
                     Console.Write("> ");
                 }
             }
@@ -158,10 +168,10 @@ namespace app.Controllers
 
             foreach (TaskItem taskItem in tasks)
             {
-                taskItem.ToString();
+                Console.WriteLine(taskItem);
             }
 
-            Console.Write("Delete the task by: <taskId>. Or leave blank to cancel");
+            Console.Write("Delete the task by: <taskId>. Or leave blank to cancel: ");
             
             while (true)
             {
@@ -175,6 +185,7 @@ namespace app.Controllers
                 if (int.TryParse(input, out int id))
                 {
                     _taskService.DeleteTask(id);
+                    Console.WriteLine($"Deleted task with id: {id}");
                     return null;
                 }
 
@@ -204,6 +215,7 @@ namespace app.Controllers
                 };
 
                 _taskService.AddTask(newTask);
+                Console.WriteLine($"Added task: {name}");
                 return null;
 
             }
