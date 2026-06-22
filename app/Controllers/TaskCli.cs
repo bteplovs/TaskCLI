@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using app.Services;
 using Microsoft.VisualBasic;
@@ -19,7 +20,24 @@ namespace app.Controllers
 
         public void RunAsync()
         {
-            Console.WriteLine("running program");
+            Console.WriteLine("== TASK MANAGER ==");
+            Console.WriteLine();
+
+            while (true)
+            {
+                PrintMenu();
+                var choice = Console.ReadLine()?.Trim();
+                switch (choice)
+                {
+                    case "1":
+                        # method
+                        break;
+                    case "2":
+
+                }
+            }
+            
+
         }
 
     }

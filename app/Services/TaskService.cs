@@ -72,6 +72,57 @@ namespace app.Services
 
         }
 
+        IEnumerable<TaskItem>? ITaskService.GetAllTasksByStatus(TaskItemStatus status)
+        {
+
+            var taskItems = new List<TaskItem>();
+
+            try
+            {
+                _connection.Open();
+
+                var sql = "SELECT * FROM TaskItem WHERE Status = @status";
+
+                using var command = new SqliteCommand(sql, _connection);
+                command.Parameters.AddWithValue("@status", status);
+
+                using var reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+
+                        if (Enum.TryParse(reader.GetString(2), true, out TaskItemStatus result)) {}
+
+                        var taskItem = new TaskItem
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Status = result,
+                            Created = reader.GetString(3)
+
+                        };
+                        taskItems.Add(taskItem);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No Tasks");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return taskItems;
+
+        }
+
         TaskItem? ITaskService.GetTaskById(int id)
         {
 
